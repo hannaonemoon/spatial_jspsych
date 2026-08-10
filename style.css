@@ -1,0 +1,80 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: #fff;
+}
+
+.task-wrap {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  justify-items: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.scene {
+  width: min(1200px, 95vw);
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.panel {
+  background: #1b1b1b;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.panel h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ddd;
+}
+
+.art-img, .map-img {
+  width: 100%;
+  display: block;
+  border-radius: 6px;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.map-container {
+  position: relative;
+}
+
+.marker {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.marker::before, .marker::after {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 0;
+  width: 2px;
+  height: 20px;
+  background: red;
+}
+.marker::before { transform: rotate(45deg); }
+.marker::after  { transform: rotate(-45deg); }
+
+.conf-wrap {
+  text-align: center;
+  margin-top: 8px;
+}
+.small {
+  font-size: 13px;
+  color: #bbb;
+}
