@@ -21,146 +21,6 @@ if (!session_date) {
   return;
 }
 
-
-  // -----------------------------
-  // 1) Local helper trial types
-  // -----------------------------
-  class ParticipantIdPlugin {
-    constructor(jsPsych) { this.jsPsych = jsPsych; }
-    trial(display_element) {
-      const startTime = performance.now();
-      display_element.innerHTML = `
-        <div class="recognition-task-container">
-          <div class="question-container" style="max-width:500px;">
-            <h2>Enter Participant ID</h2>
-            <input id="input-field" type="text" class="btn"
-              style="background:#fff;border:1px solid var(--border-color);color:var(--text-main);font-size:1.1rem;padding:10px;width:100%;text-align:center;box-sizing:border-box;margin-bottom:20px;box-shadow:none;cursor:text;font-family:var(--font-main);"
-              placeholder="e.g. P001" required />
-            <button id="next-btn" class="btn" style="min-width:120px;">Next</button>
-          </div>
-        </div>
-      `;
-      const nextBtn = display_element.querySelector('#next-btn');
-      const input = display_element.querySelector('#input-field');
-      input.focus();
-      input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && input.value.trim() !== '') nextBtn.click();
-      });
-      nextBtn.addEventListener('click', () => {
-        const val = input.value.trim();
-        if (!val) return alert('Please enter Participant ID');
-        if (!val.startsWith('P')) return alert('Participant ID must start with "P"');
-        display_element.innerHTML = '';
-        this.jsPsych.finishTrial({
-          participant_id: val,
-          stimulus: 'Enter Participant ID',
-          response: val,
-          rt: Math.round(performance.now() - startTime)
-        });
-      });
-    }
-  }
-  ParticipantIdPlugin.info = { name: 'participant-id-input', parameters: {} };
-
-  class DatePlugin {
-    constructor(jsPsych) { this.jsPsych = jsPsych; }
-    trial(display_element) {
-      const startTime = performance.now();
-      const today = new Date().toISOString().split('T')[0];
-      display_element.innerHTML = `
-        <div class="recognition-task-container">
-          <div class="question-container" style="max-width:500px;">
-            <h2>Select Date</h2>
-            <input id="input-field" type="date" value="${today}" class="btn"
-              style="background:#fff;border:1px solid var(--border-color);color:var(--text-main);font-size:1.1rem;padding:10px;width:100%;text-align:center;box-sizing:border-box;margin-bottom:20px;box-shadow:none;cursor:text;font-family:var(--font-main);"
-              required />
-            <button id="next-btn" class="btn" style="min-width:120px;">Next</button>
-          </div>
-        </div>
-      `;
-      const nextBtn = display_element.querySelector('#next-btn');
-      const input = display_element.querySelector('#input-field');
-      nextBtn.addEventListener('click', () => {
-        const val = input.value.trim();
-        if (!val) return alert('Please select date');
-        display_element.innerHTML = '';
-        this.jsPsych.finishTrial({
-          session_date: val,
-          stimulus: 'Select Date',
-          response: val,
-          rt: Math.round(performance.now() - startTime)
-        });
-      });
-    }
-  }
-  DatePlugin.info = { name: 'session-date-input', parameters: {} };
-
-  class RaNamePlugin {
-    constructor(jsPsych) { this.jsPsych = jsPsych; }
-    trial(display_element) {
-      const startTime = performance.now();
-      display_element.innerHTML = `
-        <div class="recognition-task-container">
-          <div class="question-container" style="max-width:500px;">
-            <h2>Enter RA Name</h2>
-            <input id="input-field" type="text" class="btn"
-              style="background:#fff;border:1px solid var(--border-color);color:var(--text-main);font-size:1.1rem;padding:10px;width:100%;text-align:center;box-sizing:border-box;margin-bottom:20px;box-shadow:none;cursor:text;font-family:var(--font-main);"
-              placeholder="e.g. Jane Doe" required />
-            <button id="next-btn" class="btn" style="min-width:120px;">Next</button>
-          </div>
-        </div>
-      `;
-      const nextBtn = display_element.querySelector('#next-btn');
-      const input = display_element.querySelector('#input-field');
-      nextBtn.addEventListener('click', () => {
-        const val = input.value.trim();
-        if (!val) return alert('Please enter RA Name');
-        display_element.innerHTML = '';
-        this.jsPsych.finishTrial({
-          ra_name: val,
-          stimulus: 'Enter RA Name',
-          response: val,
-          rt: Math.round(performance.now() - startTime)
-        });
-      });
-    }
-  }
-  RaNamePlugin.info = { name: 'ra-name-input', parameters: {} };
-
-  class WaitForStartPlugin {
-    constructor(jsPsych) { this.jsPsych = jsPsych; }
-    trial(display_element) {
-      const startTime = performance.now();
-      display_element.innerHTML = `
-        <div class="recognition-task-container">
-          <div class="question-container" style="max-width:600px;">
-            <h2 style="margin-bottom:30px;font-weight:normal;line-height:1.6;">
-              Please wait for task instructions from the researcher.
-            </h2>
-            <input id="input-field" type="text" class="btn"
-              style="background:#fff;border:1px solid var(--border-color);color:var(--text-main);font-size:1.1rem;padding:10px;width:100%;text-align:center;box-sizing:border-box;margin-bottom:20px;box-shadow:none;cursor:text;font-family:var(--font-main);" />
-            <button id="next-btn" class="btn" style="min-width:120px;">Next</button>
-          </div>
-        </div>
-      `;
-      const nextBtn = display_element.querySelector('#next-btn');
-      const input = display_element.querySelector('#input-field');
-      nextBtn.addEventListener('click', () => {
-        const val = input.value.trim().toLowerCase();
-        if (val !== 'start') return alert('Please type "start" to continue.');
-        display_element.innerHTML = '';
-        this.jsPsych.finishTrial({
-          stimulus: 'Please wait for task instructions from the researcher.',
-          response: 'start',
-          rt: Math.round(performance.now() - startTime)
-        });
-      });
-    }
-  }
-  WaitForStartPlugin.info = { name: 'wait-for-start', parameters: {} };
-
-
-  
   const floorplanPath = "floorplan.png";
 
   const artworkFiles = [
@@ -217,7 +77,7 @@ if (!session_date) {
   const trials = artworkFiles.map((file, i) => ({
     artwork_id: `ART${String(i + 1).padStart(3, "0")}`,
     artwork_name: file.replace(".png", ""),
-    artwork_path: `assets/Real/${file}`,
+    artwork_path: `artworks/${file}`,
     floorplan_path: floorplanPath
   }));
 
@@ -275,8 +135,7 @@ if (!session_date) {
             artwork_path: t.artwork_path,
             trial_index: idx + 1,
             participant_id,
-            session_date,
-
+            session_date
           },
           on_load: () => {
             const start = performance.now();
@@ -331,6 +190,7 @@ if (!session_date) {
             trial_index: idx + 1,
             participant_id,
             session_date,
+
           },
           on_finish: (data) => {
             data.participant_response_x = clickRecord?.participant_response_x ?? null;
@@ -342,11 +202,6 @@ if (!session_date) {
       ]
     };
   }
-  const participant_id_trial = { type: ParticipantIdPlugin };
-  const date_trial = { type: DatePlugin };
-  const ra_name_trial = { type: RaNamePlugin };
-  const wait_for_start_trial = { type: WaitForStartPlugin };
-
 
   const timeline = [preload, intro];
   randomized.forEach((t, idx) => timeline.push(makeFloorTrial(t, idx)));
@@ -357,14 +212,6 @@ if (!session_date) {
     choices: ["Finish"],
     data: { task: "spatial", phase: "complete", participant_id, session_date }
   });
-
-  const mainTimeline = [];
-  mainTimeline.push(
-    participant_id_trial,
-    date_trial,
-    ra_name_trial,
-    wait_for_start_trial
-  );
 
   jsPsych.run(timeline);
 })();
