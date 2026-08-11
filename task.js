@@ -91,7 +91,7 @@ if (!session_date) {
   const intro = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-      <div style="max-width:800px;margin:0 auto;text-align:left;line-height:1.5">
+      <div style="max-width:800px;margin:0 auto;text-align:center;line-height:1.5">
         <h2>Memory for Artwork Locations</h2>
         <p>You will see one artwork at a time.</p>
         <p><b>Task:</b> On the museum floorplan, click where you think the artwork was located.</p>
