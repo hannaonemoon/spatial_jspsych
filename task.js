@@ -5,7 +5,37 @@
   let participant_id = "";
   let session_date = "";
 
-  function saveDataAsCSV(message) {
+  function renderDownloadMessage(message, url, filename) {
+    const wrapper = document.createElement("div");
+    wrapper.style.padding = "40px";
+    wrapper.style.color = "white";
+    wrapper.style.fontFamily = "Arial";
+
+    const messageP = document.createElement("p");
+    messageP.textContent = message;
+    wrapper.appendChild(messageP);
+
+    const fallbackP = document.createElement("p");
+    fallbackP.textContent = "If the download did not start automatically, click below:";
+    wrapper.appendChild(fallbackP);
+
+    const downloadLink = document.createElement("a");
+    downloadLink.href = url;
+    downloadLink.download = filename;
+    downloadLink.style.color = "#8ec5ff";
+    downloadLink.textContent = "Download CSV";
+    downloadLink.addEventListener("click", () => {
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }, { once: true });
+    wrapper.appendChild(downloadLink);
+
+    window.addEventListener("beforeunload", () => URL.revokeObjectURL(url), { once: true });
+
+    document.body.innerHTML = "";
+    document.body.appendChild(wrapper);
+  }
+
+  function saveDataAsCSV(message, renderPage = true) {
     const safeParticipant = (participant_id || "unknown").replace(/[^\w.-]+/g, "_");
     const safeDate = (session_date || String(Date.now())).replace(/[^\w.-]+/g, "_");
     const filename = `spatial_task_${safeParticipant}_${safeDate}.csv`;
@@ -21,23 +51,20 @@
     tempLink.click();
     tempLink.remove();
 
-    document.body.innerHTML = `
-      <div style="padding:40px;color:white;font-family:Arial">
-        <p>${message}</p>
-        <p>If the download did not start automatically, click below:</p>
-        <a href="${url}" download="${filename}" style="color:#8ec5ff;">Download CSV</a>
-      </div>
-    `;
+    if (renderPage) {
+      renderDownloadMessage(message, url, filename);
+    }
 
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    return { url, filename };
   }
 
   function finalizeStudy(message) {
     if (studyFinalized) return;
     studyFinalized = true;
+    const download = saveDataAsCSV(message, false);
     // End the jsPsych timeline (triggers on_finish, but studyFinalized guards it).
     jsPsych.endExperiment(message);
-    setTimeout(() => saveDataAsCSV(message), 0);
+    setTimeout(() => renderDownloadMessage(message, download.url, download.filename), 0);
   }
 
   const jsPsych = initJsPsych({
