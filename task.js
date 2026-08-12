@@ -260,9 +260,9 @@
           stimulus: `
             <div class="conf-wrap">
               <h3>How confident are you in that location?</h3>
-              <h3>High:  Confident that you are on the correct wall or within about 10 feet of the actual location of the piece</h3>
-              <h3>Med:  Confident that you are within the approximate area of the piece (e.g., the correct room)</h3>
-              <h3>Low:  Very little confidence that you are even in the correct room</h3>
+              <p style="text-align: left;">High:  Confident that you are on the correct wall or within about 10 feet of the actual location of the piece</p>
+              <p style="text-align: left;">Med:  Confident that you are within the approximate area of the piece (e.g., the correct room)</p>
+              <p style="text-align: left;">Low:  Very little confidence that you are even in the correct room</p>
             </div>
           `,
           choices: ["Low", "Med", "High"],
@@ -293,7 +293,7 @@
 
   timeline.push({
     type: jsPsychHtmlButtonResponse,
-    stimulus: "<div style='padding:20px;'><h3>You have completed the task!</div><div style ='padding:20px;'>Please click the button below to finish the task.</h3></div>",
+    stimulus: "<div style='padding:20px;'><h3>You have completed the task!</h3><p>Please click the button below to finish the task.</p></div>",
     choices: ["Finish"],
     data: { task: "spatial", phase: "complete", participant_id, session_date }
   });
