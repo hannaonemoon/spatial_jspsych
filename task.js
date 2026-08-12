@@ -5,19 +5,39 @@
   let participant_id = "";
   let session_date = "";
 
-  function saveDataAsCSV() {
-    const filename = `spatial_task_${participant_id || "unknown"}_${session_date || Date.now()}.csv`;
-    jsPsych.data.get().localSave("csv", filename);
+  function saveDataAsCSV(message) {
+    const safeParticipant = (participant_id || "unknown").replace(/[^\w.-]+/g, "_");
+    const safeDate = (session_date || String(Date.now())).replace(/[^\w.-]+/g, "_");
+    const filename = `spatial_task_${safeParticipant}_${safeDate}.csv`;
+    const csvText = jsPsych.data.get().csv();
+    const blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const tempLink = document.createElement("a");
+    tempLink.href = url;
+    tempLink.download = filename;
+    tempLink.style.display = "none";
+    document.body.appendChild(tempLink);
+    tempLink.click();
+    tempLink.remove();
+
+    document.body.innerHTML = `
+      <div style="padding:40px;color:white;font-family:Arial">
+        <p>${message}</p>
+        <p>If the download did not start automatically, click below:</p>
+        <a href="${url}" download="${filename}" style="color:#8ec5ff;">Download CSV</a>
+      </div>
+    `;
+
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
   }
 
   function finalizeStudy(message) {
     if (studyFinalized) return;
     studyFinalized = true;
-    saveDataAsCSV();
     // End the jsPsych timeline (triggers on_finish, but studyFinalized guards it).
     jsPsych.endExperiment(message);
-    // Ensure the message is visible regardless of how endExperiment renders it.
-    document.body.innerHTML = `<div style='padding:40px;color:white;font-family:Arial'>${message}</div>`;
+    setTimeout(() => saveDataAsCSV(message), 0);
   }
 
   const jsPsych = initJsPsych({
@@ -25,8 +45,7 @@
       if (!studyFinalized) {
         // Normal completion path — experiment ended naturally
         studyFinalized = true;
-        saveDataAsCSV();
-        document.body.innerHTML = "<div style='padding:40px;color:white;font-family:Arial'>Done. CSV downloaded.</div>";
+        saveDataAsCSV("Done. CSV downloaded.");
       }
       // If studyFinalized is already true, endExperiment() called on_finish
       // after saving; no duplicate save needed.
