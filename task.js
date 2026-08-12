@@ -35,7 +35,7 @@
     document.body.appendChild(wrapper);
   }
 
-  function saveDataAsCSV(message, renderPage = true) {
+  function saveDataAsCSV() {
     const safeParticipant = (participant_id || "unknown").replace(/[^\w.-]+/g, "_");
     const safeDate = (session_date || String(Date.now())).replace(/[^\w.-]+/g, "_");
     const filename = `spatial_task_${safeParticipant}_${safeDate}.csv`;
@@ -51,17 +51,13 @@
     tempLink.click();
     tempLink.remove();
 
-    if (renderPage) {
-      setTimeout(() => renderDownloadMessage(message, url, filename), 0);
-    }
-
     return { url, filename };
   }
 
   function finalizeStudy(message) {
     if (studyFinalized) return;
     studyFinalized = true;
-    const download = saveDataAsCSV(message, false);
+    const download = saveDataAsCSV();
     // End the jsPsych timeline (triggers on_finish, but studyFinalized guards it).
     jsPsych.endExperiment(message);
     renderDownloadMessage(message, download.url, download.filename);
@@ -72,7 +68,10 @@
       if (!studyFinalized) {
         // Normal completion path — experiment ended naturally
         studyFinalized = true;
-        saveDataAsCSV("Done. CSV downloaded.");
+        const download = saveDataAsCSV();
+        setTimeout(() => {
+          renderDownloadMessage("Done. CSV downloaded.", download.url, download.filename);
+        }, 0);
       }
       // If studyFinalized is already true, endExperiment() called on_finish
       // after saving; no duplicate save needed.
