@@ -7,6 +7,13 @@
     }
   });
 
+  document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey && e.key === "9") {
+      e.preventDefault();
+      jsPsych.abortExperiment();
+    }
+  });
+
 
   const participant_id = (prompt("Participant ID:") || "").trim();
 if (!participant_id) {
