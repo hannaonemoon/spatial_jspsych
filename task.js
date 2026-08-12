@@ -29,8 +29,8 @@
     }, { once: true });
     wrapper.appendChild(downloadLink);
 
-    document.body.innerHTML = "";
-    document.body.appendChild(wrapper);
+    window.addEventListener("beforeunload", () => URL.revokeObjectURL(url), { once: true });
+    document.body.replaceChildren(wrapper);
   }
 
   function saveDataAsCSV() {
