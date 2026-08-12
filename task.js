@@ -8,7 +8,7 @@
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.ctrlKey && e.key === "p") {
+    if (e.ctrlKey && e.key === "9") {
       e.preventDefault();
       jsPsych.abortExperiment();
     }
