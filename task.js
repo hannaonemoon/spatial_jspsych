@@ -52,7 +52,7 @@
     tempLink.remove();
 
     if (renderPage) {
-      renderDownloadMessage(message, url, filename);
+      setTimeout(() => renderDownloadMessage(message, url, filename), 0);
     }
 
     return { url, filename };
@@ -64,7 +64,7 @@
     const download = saveDataAsCSV(message, false);
     // End the jsPsych timeline (triggers on_finish, but studyFinalized guards it).
     jsPsych.endExperiment(message);
-    setTimeout(() => renderDownloadMessage(message, download.url, download.filename), 0);
+    renderDownloadMessage(message, download.url, download.filename);
   }
 
   const jsPsych = initJsPsych({
