@@ -14,9 +14,10 @@
     if (studyFinalized) return;
     studyFinalized = true;
     saveDataAsCSV();
-    // Use jsPsych.endExperiment so jsPsych cleans up properly;
-    // on_finish will show the message via document.body replacement.
+    // End the jsPsych timeline (triggers on_finish, but studyFinalized guards it).
     jsPsych.endExperiment(message);
+    // Ensure the message is visible regardless of how endExperiment renders it.
+    document.body.innerHTML = `<div style='padding:40px;color:white;font-family:Arial'>${message}</div>`;
   }
 
   const jsPsych = initJsPsych({
