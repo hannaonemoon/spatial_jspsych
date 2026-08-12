@@ -260,9 +260,9 @@
           stimulus: `
             <div class="conf-wrap">
               <h3>How confident are you in that location?</h3>
-              <p style="text-align: left;">High:  Confident that you are on the correct wall or within about 10 feet of the actual location of the piece</p>
-              <p style="text-align: left;">Med:  Confident that you are within the approximate area of the piece (e.g., the correct room)</p>
-              <p style="text-align: left;">Low:  Very little confidence that you are even in the correct room</p>
+              <p class="left-text">High:  Confident that you are on the correct wall or within about 10 feet of the actual location of the piece</p>
+              <p class="left-text">Med:  Confident that you are within the approximate area of the piece (e.g., the correct room)</p>
+              <p class="left-text">Low:  Very little confidence that you are even in the correct room</p>
             </div>
           `,
           choices: ["Low", "Med", "High"],
