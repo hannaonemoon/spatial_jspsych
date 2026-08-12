@@ -1,15 +1,23 @@
 (() => {
+  let studyFinalized = false;
+
+  function finalizeStudy(message) {
+    if (studyFinalized) return;
+    studyFinalized = true;
+    jsPsych.data.get().localSave("csv", `spatial_task_${Date.now()}.csv`);
+    document.body.innerHTML = `<div style='padding:40px;color:white;font-family:Arial'>${message}</div>`;
+  }
+
   const jsPsych = initJsPsych({
     on_finish: () => {
-      jsPsych.data.get().localSave("csv", `spatial_task_${Date.now()}.csv`);
-      document.body.innerHTML =
-        "<div style='padding:40px;color:white;font-family:Arial'>Done. CSV downloaded.</div>";
+      finalizeStudy("Done. CSV downloaded.");
     }
   });
 
   document.addEventListener("keydown", (e) => {
     if (e.ctrlKey && e.key === "9") {
       e.preventDefault();
+      finalizeStudy("Study ended early. CSV downloaded.");
       jsPsych.abortExperiment();
     }
   });
