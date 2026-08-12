@@ -1,40 +1,60 @@
 (() => {
   let studyFinalized = false;
 
+  // participant_id and session_date are set after prompts; captured by closure.
+  let participant_id = "";
+  let session_date = "";
+
+  function saveDataAsCSV() {
+    const filename = `spatial_task_${participant_id || "unknown"}_${session_date || Date.now()}.csv`;
+    jsPsych.data.get().localSave("csv", filename);
+  }
+
   function finalizeStudy(message) {
     if (studyFinalized) return;
     studyFinalized = true;
-    jsPsych.data.get().localSave("csv", `spatial_task_${Date.now()}.csv`);
+    saveDataAsCSV();
+    // End the jsPsych timeline (triggers on_finish, but studyFinalized guards it).
+    jsPsych.endExperiment(message);
+    // Ensure the message is visible regardless of how endExperiment renders it.
     document.body.innerHTML = `<div style='padding:40px;color:white;font-family:Arial'>${message}</div>`;
   }
 
   const jsPsych = initJsPsych({
     on_finish: () => {
-      finalizeStudy("Done. CSV downloaded.");
+      if (!studyFinalized) {
+        // Normal completion path — experiment ended naturally
+        studyFinalized = true;
+        saveDataAsCSV();
+        document.body.innerHTML = "<div style='padding:40px;color:white;font-family:Arial'>Done. CSV downloaded.</div>";
+      }
+      // If studyFinalized is already true, endExperiment() called on_finish
+      // after saving; no duplicate save needed.
     }
   });
 
   document.addEventListener("keydown", (e) => {
     if (e.ctrlKey && e.key === "9") {
       e.preventDefault();
-      finalizeStudy("Study ended early. CSV downloaded.");
-      jsPsych.abortExperiment();
+      if (!studyFinalized) {
+        finalizeStudy("Study ended early. CSV downloaded.");
+      }
     }
-  });
+  }, { capture: true });
 
 
-  const participant_id = (prompt("Participant ID:") || "").trim();
-if (!participant_id) {
-  alert("Participant ID required.");
-  return;
-}
+  participant_id = (prompt("Participant ID:") || "").trim();
+  if (!participant_id) {
+    alert("Participant ID required.");
+    return;
+  }
 
-const defaultDate = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-const session_date = (prompt("Date (YYYY-MM-DD):", defaultDate) || "").trim();
-if (!session_date) {
-  alert("Date required.");
-  return;
-}
+  const defaultDate = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  session_date = (prompt("Date (YYYY-MM-DD):", defaultDate) || "").trim();
+  if (!session_date) {
+    alert("Date required.");
+    return;
+  }
 
   const floorplanPath = "floorplan.png";
 
