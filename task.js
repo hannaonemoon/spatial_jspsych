@@ -39,17 +39,19 @@
     const filename = `spatial_task_${safeParticipant}_${safeDate}.csv`;
     const csvText = jsPsych.data.get().csv();
     const blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
+    const autoUrl = URL.createObjectURL(blob);
+    const fallbackUrl = URL.createObjectURL(blob);
 
     const tempLink = document.createElement("a");
-    tempLink.href = url;
+    tempLink.href = autoUrl;
     tempLink.download = filename;
     tempLink.style.display = "none";
     document.body.appendChild(tempLink);
     tempLink.click();
     tempLink.remove();
+    setTimeout(() => URL.revokeObjectURL(autoUrl), 1000);
 
-    return { url, filename };
+    return { url: fallbackUrl, filename };
   }
 
   function finalizeStudy(message) {
