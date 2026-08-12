@@ -5,19 +5,62 @@
   let participant_id = "";
   let session_date = "";
 
+  function renderDownloadMessage(message, url, filename) {
+    const wrapper = document.createElement("div");
+    wrapper.style.padding = "40px";
+    wrapper.style.color = "white";
+    wrapper.style.fontFamily = "Arial";
+
+    const messageP = document.createElement("p");
+    messageP.textContent = message;
+    wrapper.appendChild(messageP);
+
+    const fallbackP = document.createElement("p");
+    fallbackP.textContent = "If the download did not start automatically, click below:";
+    wrapper.appendChild(fallbackP);
+
+    const downloadLink = document.createElement("a");
+    downloadLink.href = url;
+    downloadLink.download = filename;
+    downloadLink.style.color = "#8ec5ff";
+    downloadLink.textContent = "Download CSV";
+    downloadLink.addEventListener("click", () => {
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }, { once: true });
+    wrapper.appendChild(downloadLink);
+
+    window.addEventListener("beforeunload", () => URL.revokeObjectURL(url), { once: true });
+    document.body.replaceChildren(wrapper);
+  }
+
   function saveDataAsCSV() {
-    const filename = `spatial_task_${participant_id || "unknown"}_${session_date || Date.now()}.csv`;
-    jsPsych.data.get().localSave("csv", filename);
+    const safeParticipant = (participant_id || "unknown").replace(/[^\w.-]+/g, "_");
+    const safeDate = (session_date || String(Date.now())).replace(/[^\w.-]+/g, "_");
+    const filename = `spatial_task_${safeParticipant}_${safeDate}.csv`;
+    const csvText = jsPsych.data.get().csv();
+    const blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
+    const autoUrl = URL.createObjectURL(blob);
+    const fallbackUrl = URL.createObjectURL(blob);
+
+    const tempLink = document.createElement("a");
+    tempLink.href = autoUrl;
+    tempLink.download = filename;
+    tempLink.style.display = "none";
+    document.body.appendChild(tempLink);
+    tempLink.click();
+    tempLink.remove();
+    setTimeout(() => URL.revokeObjectURL(autoUrl), 1000);
+
+    return { url: fallbackUrl, filename };
   }
 
   function finalizeStudy(message) {
     if (studyFinalized) return;
     studyFinalized = true;
-    saveDataAsCSV();
+    const download = saveDataAsCSV();
     // End the jsPsych timeline (triggers on_finish, but studyFinalized guards it).
     jsPsych.endExperiment(message);
-    // Ensure the message is visible regardless of how endExperiment renders it.
-    document.body.innerHTML = `<div style='padding:40px;color:white;font-family:Arial'>${message}</div>`;
+    renderDownloadMessage(message, download.url, download.filename);
   }
 
   const jsPsych = initJsPsych({
@@ -25,8 +68,10 @@
       if (!studyFinalized) {
         // Normal completion path — experiment ended naturally
         studyFinalized = true;
-        saveDataAsCSV();
-        document.body.innerHTML = "<div style='padding:40px;color:white;font-family:Arial'>Done. CSV downloaded.</div>";
+        const download = saveDataAsCSV();
+        setTimeout(() => {
+          renderDownloadMessage("Done. CSV downloaded.", download.url, download.filename);
+        }, 0);
       }
       // If studyFinalized is already true, endExperiment() called on_finish
       // after saving; no duplicate save needed.
