@@ -29,7 +29,7 @@
     }, { once: true });
     wrapper.appendChild(downloadLink);
 
-    window.addEventListener("beforeunload", () => URL.revokeObjectURL(url), { once: true });
+    setTimeout(() => URL.revokeObjectURL(url), 30 * 60 * 1000);
 
     document.body.innerHTML = "";
     document.body.appendChild(wrapper);
